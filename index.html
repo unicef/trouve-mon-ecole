@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Locate My School</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link href="cover.css" rel="stylesheet">
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+
+      <header class="masthead mb-auto">
+        <div class="inner">
+          <h3 class="masthead-brand">Trouve Mon École</h3>
+          <nav class="nav nav-masthead justify-content-center">
+            <a class="nav-link active" href="#">Français</a>
+            <a class="nav-link" href="https://locatemyschool.org">English</a>
+          </nav>
+        </div>
+      </header>
+
+
+      <main role="main" class="inner cover">
+        <p class="lead">Ce site vous aide à localiser votre école et à soumettre la localisation de votre école au UNICEF Project Connect.</p>
+        <p class="lead">
+          <a href="#" class="btn btn-lg btn-secondary" id="start">Cliquer pour commencer</a>
+        </p>
+
+        <p id = "status"></p>
+        <a id = "map-link" target="_blank"></a>
+
+        <form id="submit-form" style="display:none; padding-top: 1.5em">
+
+          <div class="form-group">
+            Est-ce que votre école a l'électricité?<br/>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="electricity" id="electricityYes" value="Yes" required>
+              <label class="form-check-label" for="electricityYes">Oui</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="electricity" id="electricityNo" value="No">
+              <label class="form-check-label" for="electricityNo">Non</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            Est-ce que votre école a une connexion Internet?<br/>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="internet" id="internetYes" value="Yes" required>
+              <label class="form-check-label" for="internetYes">Oui</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="internet" id="internetNo" value="No">
+              <label class="form-check-label" for="internetNo">Non</label>
+            </div>
+          </div>
+
+          <div class="form-group col-md-4 offset-md-4">
+            <label for="exampleInputEmail1">Entrer le code de votre école</label>
+            <input type="text" class="form-control" id="code" name="code" required>
+          </div>
+          <input type="hidden" id="lat" name="lat" value="">
+          <input type="hidden" id="lng" name="lng" value="">
+          <button type="submit" id="submit-btn" class="btn btn-primary">Soumettre</button>
+        </form>
+      </main>
+
+      <footer class="mastfoot mt-auto">
+      <div class="inner">
+        <p>En savoir plus sur <a href="https://www.projectconnect.world/" target="_blank">Project Connect</a>.</p>
+      </div>
+      </footer>
+    </div>
+
+    <script>
+
+      const status = document.querySelector('#status');
+      const start = document.querySelector('#start');
+      const mapLink = document.querySelector('#map-link');
+      const lat = document.querySelector('#lat');
+      const lng = document.querySelector('#lng');
+      const submitForm = document.querySelector('#submit-form');
+
+      function geoFindMe() {
+
+        mapLink.href = '';
+        mapLink.textContent = '';
+
+        function success(position) {
+          const latitude  = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          status.textContent = '';
+          mapLink.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
+          mapLink.innerHTML = `Latitude: ${latitude} °`+'<br/>'+`Longitude: ${longitude} °`;
+          submitForm.style.display = 'block';
+          lat.value = latitude;
+          lng.value = longitude;
+        }
+
+        function error(error) {
+          status.innerHTML = 'Impossible de récupérer votre localisation.<br/> Code erreur:'+error.code+': '+error.message;
+        }
+
+        start.style.display = 'None';
+
+        if(!navigator.geolocation) {
+          status.textContent = "La géolocalisation n'est pas supportée par votre navigateur.";
+        } else {
+          status.textContent = 'Localisation en cours…';
+          navigator.geolocation.getCurrentPosition(success, error);
+        }
+
+      }
+
+      document.querySelector('#start').addEventListener('click', geoFindMe);
+
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbxsnPBB8wLT14Dy81gTSViWIaHId-ALZMYt58l9XeA8yA51tJFT/exec'
+      const form = document.forms['submit-form']
+
+      form.addEventListener('submit', e => {
+        e.preventDefault()
+
+        submitForm.style.display = 'none';
+        mapLink.innerHTML = '';
+        status.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="sr-only">Chargement...</span></div></div>';
+
+        fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+          .then(response => {
+            console.log('Success!', response);
+            status.innerHTML = 'Votre localisation a été soumise avec succès 🙌<br/> Merci! ❤️'
+          })
+          .catch(error => {
+            console.error('Error!', error.message);
+            status.innetHTML = "Une erreur s'est produite pendant l'enregistrement de votre localisation.<br/> Merci de contacter <a href=\"mailto:projectconnect@unicef.org\">projectconnect@unicef.org</a>";
+          })
+      })
+
+
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+  </body>
+</html>

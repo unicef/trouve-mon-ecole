@@ -24,11 +24,11 @@
     </style>
   </head>
   <body class="text-center">
-    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <div class="cover-container d-flex w-100 h-100 mx-auto flex-column">
 
-      <header class="masthead mb-auto">
+      <header class="masthead mb-auto p-3">
         <div class="inner">
-          <h3 class="masthead-brand">Trouve Mon École</h3>
+          <h3 class="masthead-brand" style="font-weight:400">Trouve Mon École</h3>
           <nav class="nav nav-masthead justify-content-center">
             <a class="nav-link" href="https://locatemyschool.org">English</a>
             <a class="nav-link active" href="#">Français</a>
@@ -40,7 +40,7 @@
       <main role="main" class="inner cover">
         <p class="lead">Ce site vous aide à localiser votre école et à soumettre la localisation de votre école au UNICEF Project Connect.</p>
         <p class="lead">
-          <a href="#" class="btn btn-lg btn-secondary" id="start">Cliquer pour commencer</a>
+          <a href="#" class="btn btn-lg blue" id="start">Cliquer pour commencer</a>
         </p>
 
         <p id = "status"></p>
@@ -78,13 +78,18 @@
           </div>
           <input type="hidden" id="lat" name="lat" value="">
           <input type="hidden" id="lng" name="lng" value="">
-          <button type="submit" id="submit-btn" class="btn btn-primary">Soumettre</button>
+          <button type="submit" id="submit-btn" class="btn blue">Soumettre</button>
         </form>
       </main>
 
-      <footer class="mastfoot mt-auto">
-      <div class="inner">
-        <p>En savoir plus sur <a href="https://www.projectconnect.world/" target="_blank">Project Connect</a>.</p>
+      <footer class="mastfoot mt-auto blue container">
+      <div class="row">
+        <div class="col-6 text-left" style="padding-top: 0.5em">
+          <img src="img/unicef-logo.png">
+        </div>
+        <div class="col-6 text-right smallscreen" style="padding-top: 0.5em">
+          <p>En savoir plus sur <a href="https://www.projectconnect.world/" target="_blank" style="color:#FFF; text-decoration:underline">Project&nbsp;Connect</a>.</p>
+        </div>
       </div>
       </footer>
     </div>
